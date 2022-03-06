@@ -7,5 +7,27 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(broom)
+library(pROC)
+library(plotROC) 
+library(knitr)
+```
+
+```{r}
+spotify_data <- read_csv("spotify.csv") %>%
+  drop_na() %>% #remove observations with missing values
+  mutate(key = case_when(
+    key == 2 ~ "D", 
+    key == 3 ~ "D#", 
+    TRUE ~ "Other"
+  ),
+  target = as.factor(target), 
+  )
+
+ggplot(data = spotify_data, aes(x = key, fill = target)) + 
+  geom_bar(position = "fill") + 
+  labs(y = "target", title = "Target vs Key") +
+  coord_flip()
 ```
 
