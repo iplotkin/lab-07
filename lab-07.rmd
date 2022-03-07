@@ -90,8 +90,20 @@ ggplot(data = spotify_aug, aes(x = key, y = .resid)) +
 ```
 
 9. 
-```{r}
+The linearity assumption is not satisfied because the binned residual vs predicted values plot does not have a cloud distribution. It has a V shape pattern to it. I also did not test every variable's residual plot for patterns.
 
+### Part III: Model Assessment & Prediction
+10. 
+```{r}
+(roc_curve <- ggplot(spotify_aug, 
+                     aes(d = as.numeric(target) - 1, 
+                         m = .fitted)) +
+  geom_roc(n.cuts = 10, labelround = 3) + 
+  geom_abline(intercept = 0) + 
+  labs(x = "False Positive Rate (1 - Specificity)", 
+       y = "True Positive Rate (Sensitivity)") )
 ```
+
+
 
 
