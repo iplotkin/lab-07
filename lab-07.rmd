@@ -14,6 +14,7 @@ library(plotROC)
 library(knitr)
 ```
 
+1.
 ```{r}
 spotify_data <- read_csv("spotify.csv") %>%
   drop_na() %>% #remove observations with missing values
@@ -30,4 +31,67 @@ ggplot(data = spotify_data, aes(x = key, fill = target)) +
   labs(y = "target", title = "Target vs Key") +
   coord_flip()
 ```
+
+2.
+```{r}
+target_model <- glm(target ~ acousticness + danceability + duration_ms + instrumentalness + loudness +
+                speechiness + valence, data = spotify_data, family = binomial)
+
+tidy(target_model, conf.int = TRUE, exponentiate = FALSE)
+```
+
+3.
+```{r}
+target_key_model <- glm(target ~ acousticness + danceability + duration_ms + instrumentalness + 
+                        loudness + speechiness + valence + key, 
+                        data = spotify_data, family = binomial)
+
+tidy(target_key_model, conf.int = TRUE, exponentiate = FALSE)
+
+anova(target_model, target_key_model, test = "Chisq")
+```
+
+4.
+```{r}
+tidy(target_key_model, conf.int = TRUE, exponentiate = FALSE)
+
+```
+
+keyD# shows that the target score decreases by -1.07% for every song that uses that key.
+
+5. 
+```{r}
+spotify_aug <- augment(target_key_model, type.predict = "response",
+                       type.residuals = "deviance")
+
+spotify_aug
+```
+
+6.
+```{r}
+arm::binnedplot(x = spotify_aug$.fitted, y = spotify_aug$.resid,
+                xlab = "Predicted Probabilities", 
+                main = "Binned Residual vs. Predicted Values", 
+                col.int = FALSE)
+```
+
+7. 
+```{r}
+arm::binnedplot(x = spotify_aug$danceability, y = spotify_aug$.resid,
+                xlab = "Danceability", 
+                main = "Binned Residual vs. Danceability", 
+                col.int = FALSE)
+```
+
+8.
+```{r}
+ggplot(data = spotify_aug, aes(x = key, y = .resid)) + 
+  geom_boxplot()
+```
+
+9. 
+```{r}
+
+```
+
 
