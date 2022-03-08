@@ -2,7 +2,9 @@
 title: "Lab 7"
 author: "Isaac Plotkin"
 date: "3/5/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -98,12 +100,43 @@ The linearity assumption is not satisfied because the binned residual vs predict
 (roc_curve <- ggplot(spotify_aug, 
                      aes(d = as.numeric(target) - 1, 
                          m = .fitted)) +
-  geom_roc(n.cuts = 10, labelround = 3) + 
+  geom_roc(n.cuts = 20, labelround = 3) + 
   geom_abline(intercept = 0) + 
   labs(x = "False Positive Rate (1 - Specificity)", 
        y = "True Positive Rate (Sensitivity)") )
 ```
+AUC
+```{r}
+calc_auc(roc_curve)$AUC
+```
 
 
+11. Yes the model effectively differentiates between the songs the user likes versus those they don't like, but not at a very high accuracy.
 
+
+12. The best choice for threshold is 0.533 according to the ROC curve.
+
+
+13.
+```{r, warning=FALSE}
+threshold <- 0.533
+spotify_aug %>%
+  mutate(predict = if_else(.fitted > threshold, "1: Yes", "0: No")) %>%
+  group_by(target, predict) %>%
+  summarise(n = n()) %>%
+  kable(format="markdown")
+```
+
+14. 
+
+* What is the proportion of true positives (sensitivity)?
+608 / (608 + 412) = 608 / 1020 = 0.596
+<br>  
+
+* What is the proportion of false positives (1 - specificity)?
+242 / (242 + 755) = 242 / 997 = 0.243
+<br> 
+
+* What is the misclassification rate?
+(242 + 412) / (242 + 412 + 755 + 608) = 654 / 2017 = 0.324
 
